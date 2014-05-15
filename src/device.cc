@@ -255,6 +255,7 @@ namespace hpp {
 	}
       }
       upToDate_ = true;
+      hppDout (info, *this);
     }
 
     // ========================================================================
@@ -357,6 +358,7 @@ namespace hpp {
     void Device::resizeJacobians ()
     {
       jacobianCom_.resize (3, numberDof_);
+      jacobianCom_.setZero ();
       for (JointVector_t::iterator itJoint = jointVector_.begin ();
 	   itJoint != jointVector_.end () ; itJoint++) {
 	(*itJoint)->jacobian_.resize (6, numberDof_);
@@ -365,27 +367,26 @@ namespace hpp {
     }
     std::ostream& Device::print(std::ostream& os) const
     {
-      os << "Device: " << name() << std::endl;
-      os << std::endl;
-      os << " Current configuration: " << currentConfiguration ()
-	 << std::endl;
-      os << std::endl;
-      os << " Writing kinematic chain" << std::endl;
-
+      os << "digraph G {" << std::endl;
+      os << "\"Device-" << name () << "\" [shape = box label=\"Device "
+	 << name () << "\\n";
+      os << " Current configuration: " << currentConfiguration ().transpose ()
+	 << "\\n";
+      // Get position of center of mass
+      hpp::model::vector3_t com = positionCenterOfMass ();
+      os << "total mass " << mass() << ", COM: "
+	 << com [0] <<", "<< com [1] << ", " << com [2] << "\"]" << std::endl;
       //
       // Go through joints and output each joint
       //
       hpp::model::JointPtr_t joint = rootJoint();
 
       if (joint) {
+	os << "\"Device-" << name () << "\"->\"" << rootJoint ()->name ()
+	   << "\"" << std::endl;
 	os << *joint << std::endl;
       }
-      // Get position of center of mass
-      hpp::model::vector3_t com = positionCenterOfMass ();
-
-      //debug
-      os << "total mass " << mass() << ", COM: "
-	 << com [0] <<", "<< com [1] << ", " << com [2] <<std::endl;
+      os << "}" << std::endl;
       return os;
     }
   } // namespace model
