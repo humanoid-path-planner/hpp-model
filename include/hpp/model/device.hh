@@ -64,7 +64,7 @@ namespace hpp {
       /// \}
 
       /// Get name of device
-      const std::string& name () {return name_;}
+      const std::string& name () const {return name_;}
 
       /// \brief Creation of a new device
       /// \return a shared pointer to the new device
@@ -93,7 +93,10 @@ namespace hpp {
       const JointVector_t& getJointVector () const;
 
       /// Get joint by name
-      JointPtr_t getJointByName (const std::string& name);
+      JointPtr_t getJointByName (const std::string& name) const;
+
+      /// Get joint by body name
+      JointPtr_t getJointByBodyName (const std::string& name) const;
 
       /// Size of configuration vectors
       const size_type& configSize () const
@@ -245,6 +248,10 @@ namespace hpp {
       /// Compute forward kinematics
       virtual void computeForwardKinematics ();
       /// \}
+
+      /// Print object in a stream
+      virtual std::ostream& print (std::ostream& os) const;
+
     protected:
       /// \brief Constructor
       Device(const std::string& name);
@@ -252,11 +259,12 @@ namespace hpp {
       ///
       /// \brief Initialization.
       ///
-      void init(const DeviceWkPtr& weakPtr);
+      void init(const DeviceWkPtr_t& weakPtr);
 
-    private:
       /// Recompute number of distance pairs
       void updateDistances ();
+
+    private:
       void computeJointPositions ();
       void computeJointJacobians ();
       void computeMass ();
@@ -278,11 +286,11 @@ namespace hpp {
       double mass_;
       bool upToDate_;
       Computation_t computationFlag_;
-      DeviceWkPtr weakPtr_;
+      DeviceWkPtr_t weakPtr_;
     }; // class Device
   } // namespace model
 } // namespace hpp
 
-std::ostream& operator<<(std::ostream& os, hpp::model::Device& device);
+std::ostream& operator<< (std::ostream& os, const hpp::model::Device& device);
 
 #endif // HPP_MODEL_DEVICE_HH
