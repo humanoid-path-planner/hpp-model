@@ -34,7 +34,7 @@ namespace hpp {
     class ExtraConfigSpace
     {
     public:
-      ExtraConfigSpace () : dimension_ (0), lowerBounds_ (0), upperBounds_ (0)
+      ExtraConfigSpace () : dimension_ (0), lowerBounds_ (0,0), upperBounds_ (0,0)
       {
       }
       value_type& lower (const size_type& index)
