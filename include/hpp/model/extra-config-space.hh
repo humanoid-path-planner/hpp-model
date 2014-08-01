@@ -1,8 +1,8 @@
-///
-/// Copyright (c) 2013, 2014 CNRS
-/// Author: Florent Lamiraux
-///
-///
+//
+// Copyright (c) 2013, 2014 CNRS
+// Author: Florent Lamiraux
+//
+//
 // This file is part of hpp-model
 // hpp-model is free software: you can redistribute it
 // and/or modify it under the terms of the GNU Lesser General Public
@@ -34,8 +34,10 @@ namespace hpp {
     class ExtraConfigSpace
     {
     public:
-      ExtraConfigSpace () : dimension_ (0), lowerBounds_ (0), upperBounds_ (0)
+      ExtraConfigSpace () : dimension_ (0), lowerBounds_ (), upperBounds_ ()
       {
+	lowerBounds_.resize (0);
+	upperBounds_.resize (0);
       }
       value_type& lower (const size_type& index)
       {

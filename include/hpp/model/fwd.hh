@@ -1,8 +1,8 @@
-///
-/// Copyright (c) 2011, 2012, 2013, 2014 CNRS
-/// Author: Florent Lamiraux
-///
-///
+//
+// Copyright (c) 2011, 2012, 2013, 2014 CNRS
+// Author: Florent Lamiraux
+//
+//
 // This file is part of hpp-model
 // hpp-model is free software: you can redistribute it
 // and/or modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,8 @@ namespace fcl {
   typedef boost::shared_ptr < const CollisionObject> CollisionObjectConstPtr_t;
   class CollisionGeometry;
   typedef boost::shared_ptr <CollisionGeometry> CollisionGeometryPtr_t;
+  typedef boost::shared_ptr <const CollisionGeometry>
+  CollisionGeometryConstPtr_t;
   class Transform3f;
 }
 
@@ -44,6 +46,9 @@ namespace hpp {
     HPP_PREDEF_CLASS (DistanceResult);
     HPP_PREDEF_CLASS (HumanoidRobot);
     HPP_PREDEF_CLASS (Joint);
+    HPP_PREDEF_CLASS (JointRotation);
+    HPP_PREDEF_CLASS (JointTranslation);
+    HPP_PREDEF_CLASS (JointSO3);
     HPP_PREDEF_CLASS (JointConfiguration);
     HPP_PREDEF_CLASS (ObjectFactory);
     HPP_PREDEF_CLASS (ObjectIterator);
@@ -58,7 +63,13 @@ namespace hpp {
     typedef std::vector <DistanceResult> DistanceResults_t;
     typedef boost::shared_ptr <HumanoidRobot> HumanoidRobotPtr_t;
     typedef Joint* JointPtr_t;
+    typedef JointRotation* JointRotationPtr_t;
+    typedef JointTranslation* JointTranslationPtr_t;
+    typedef JointSO3* JointSO3Ptr_t;
     typedef const Joint* JointConstPtr_t;
+    typedef const JointRotation* JointRotationConstPtr_t;
+    typedef const JointTranslation * JointTranslationConstPtr_t;
+    typedef const JointSO3* JointSO3ConstPtr_t;
     typedef std::map <std::string, JointPtr_t> JointByName_t;
     typedef std::vector <JointPtr_t> JointVector_t;    
     typedef boost::shared_ptr <Gripper> GripperPtr_t;
