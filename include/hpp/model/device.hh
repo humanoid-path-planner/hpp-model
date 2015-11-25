@@ -163,20 +163,37 @@ namespace hpp {
       /// Get current configuration
       const Configuration_t& currentConfiguration () const
       {
-	return currentConfiguration_;
+        return currentConfiguration_;
       }
+
       /// Set current configuration
       /// \return True if the current configuration was modified and false if
       ///         the current configuration did not change.
-      virtual bool currentConfiguration (ConfigurationIn_t configuration)
+      virtual bool setCurrentConfiguration (ConfigurationIn_t configuration)
       {
-	if (configuration != currentConfiguration_) {
-	  upToDate_ = false;
-	  currentConfiguration_ = configuration;
+        if (configuration != currentConfiguration_) {
+          upToDate_ = false;
+          currentConfiguration_ = configuration;
           return true;
-	}
+        }
         return false;
       }
+
+      /// Set current configuration
+      /// \return True if the current configuration was modified and false if
+      ///         the current configuration did not change.
+      /// \deprecated This method is deprecated and will be removed.
+      /// \see setCurrentConfiguration.
+      virtual bool currentConfiguration (ConfigurationIn_t configuration)
+      {
+        if (configuration != currentConfiguration_) {
+          upToDate_ = false;
+          currentConfiguration_ = configuration;
+          return true;
+        }
+        return false;
+      }
+
       /// Get the neutral configuration
       Configuration_t neutralConfiguration () const;
 
