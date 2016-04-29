@@ -32,6 +32,10 @@ namespace hpp {
     /// \param configuration initial and result configurations
     /// \param velocity velocity vector
     /// \retval result configuration reached after integration.
+    /// \retval saturate a vector of boolean, of size the number of DOF,
+    ///         where element are set to true if the integration is beyond a
+    ///         bound.
+    /// \return true if one DOF saturated.
     /// Velocity is dispatched to each joint that integrates according to its
     /// Lie group structure, i.e.
     /// \li \f$q_i += v_i\f$ for translation joint and bounded rotation joints,
@@ -40,21 +44,50 @@ namespace hpp {
     ///
     /// \note bounded degrees of freedom are saturated if the result of the
     ///       above operation is beyond a bound.
-    inline void integrate  (const DevicePtr_t& robot,
+    inline bool integrate  (const DevicePtr_t& robot,
 			    ConfigurationIn_t configuration,
-			    vectorIn_t velocity, ConfigurationOut_t result)
+			    vectorIn_t velocity, ConfigurationOut_t result,
+                            vectorBool_t& saturate)
     {
       const JointVector_t& jv (robot->getJointVector ());
+      bool ret = false;
       for (model::JointVector_t::const_iterator itJoint = jv.begin ();
 	   itJoint != jv.end (); itJoint++) {
 	size_type indexConfig = (*itJoint)->rankInConfiguration ();
 	size_type indexVelocity = (*itJoint)->rankInVelocity ();
-	(*itJoint)->configuration ()->integrate (configuration, velocity,
-						 indexConfig, indexVelocity,
-						 result);
+        ret =
+          (*itJoint)->configuration ()->integrate (
+              configuration, velocity,
+              indexConfig, indexVelocity,
+              result, saturate) || ret;
       }
       const size_type& dim = robot->extraConfigSpace().dimension();
       result.tail (dim) = configuration.tail (dim) + velocity.tail (dim);
+      return ret;
+    }
+
+    /// Integrate a constant velocity during unit time.
+    ///
+    /// \param robot robot that describes the kinematic chain
+    /// \param configuration initial and result configurations
+    /// \param velocity velocity vector
+    /// \retval result configuration reached after integration.
+    /// \return true if one DOF saturated.
+    /// Velocity is dispatched to each joint that integrates according to its
+    /// Lie group structure, i.e.
+    /// \li \f$q_i += v_i\f$ for translation joint and bounded rotation joints,
+    /// \li \f$q_i += v_i \mbox{ modulo } 2\pi\f$ for unbounded rotation joints,
+    /// \li constant rotation velocity for SO(3) joints.
+    ///
+    /// \note bounded degrees of freedom are saturated if the result of the
+    ///       above operation is beyond a bound.
+    inline bool integrate  (const DevicePtr_t& robot,
+			    ConfigurationIn_t configuration,
+			    vectorIn_t velocity, ConfigurationOut_t result)
+    {
+      static vectorBool_t saturate;
+      saturate.resize (robot->numberDof());
+      return integrate (robot, configuration, velocity, result, saturate);
     }
 
     /// Interpolate between two configurations of the robot

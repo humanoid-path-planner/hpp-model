@@ -131,12 +131,14 @@ namespace hpp {
       return 0;
     }
 
-    void AnchorJointConfig::integrate (ConfigurationIn_t,
+    bool AnchorJointConfig::integrate (ConfigurationIn_t,
 				       vectorIn_t,
 				       const size_type&,
 				       const size_type&,
-				       ConfigurationOut_t) const
+				       ConfigurationOut_t,
+                                       vectorBool_t&) const
     {
+      return false;
     }
 
     void AnchorJointConfig::difference (ConfigurationIn_t,
@@ -228,11 +230,12 @@ namespace hpp {
       return 2 * (cosIsNegative ? M_PI - theta : theta);
     }
 
-    void SO3JointConfig::integrate (ConfigurationIn_t q,
+    bool SO3JointConfig::integrate (ConfigurationIn_t q,
 				    vectorIn_t v,
 				    const size_type& indexConfig,
 				    const size_type& indexVelocity,
-				    ConfigurationOut_t result) const
+				    ConfigurationOut_t result,
+                                    vectorBool_t&) const
     {
       vector3_t omega (v [indexVelocity + 0], v [indexVelocity + 1],
 		       v [indexVelocity + 2]);
@@ -240,7 +243,7 @@ namespace hpp {
       value_type angle = .5*omega.norm();
       if (angle == 0) {
 	result.segment<4> (indexConfig) = q.segment <4> (indexConfig);
-	return;
+	return false;
       }
       // try to keep norm of quaternion close to 1.
       value_type norm2p = q.segment <4> (indexConfig).squaredNorm ();
@@ -256,6 +259,7 @@ namespace hpp {
       result [indexConfig + 1] = res.x ();
       result [indexConfig + 2] = res.y ();
       result [indexConfig + 3] = res.z ();
+      return false;
     }
 
     void SO3JointConfig::difference (ConfigurationIn_t q1,
@@ -340,23 +344,32 @@ namespace hpp {
     }
 
     template <size_type dimension>
-    void TranslationJointConfig <dimension>::integrate
+    bool TranslationJointConfig <dimension>::integrate
     (ConfigurationIn_t q, vectorIn_t v, const size_type& indexConfig,
-     const size_type& indexVelocity, ConfigurationOut_t result) const
+     const size_type& indexVelocity, ConfigurationOut_t result,
+     vectorBool_t& saturate) const
     {
       assert (indexConfig < result.size ());
       result.segment <dimension> (indexConfig) =
 	q.segment <dimension> (indexConfig) +
 	v.segment <dimension> (indexVelocity);
+      bool ret = false;
       for (unsigned int i=0; i<dimension; ++i) {
 	if (isBounded (i)) {
 	  if (result [indexConfig + i] < lowerBound (i)) {
+            ret = true;
 	    result [indexConfig + i] = lowerBound (i);
+            saturate [indexVelocity + i] = true;
 	  } else if (result [indexConfig + i] > upperBound (i)) {
+            ret = true;
 	    result [indexConfig + i] = upperBound (i);
-	  }
+            saturate [indexVelocity + i] = true;
+	  } else {
+            saturate [indexVelocity + i] = false;
+          }
 	}
       }
+      return ret;
     }
 
     template <size_type dimension>
@@ -443,10 +456,11 @@ namespace hpp {
 	return fabs (result [0]);
       }
 
-      void UnBounded::integrate (ConfigurationIn_t q, vectorIn_t v,
+      bool UnBounded::integrate (ConfigurationIn_t q, vectorIn_t v,
 				 const size_type& indexConfig,
 				 const size_type& indexVelocity,
-				 ConfigurationOut_t result) const
+				 ConfigurationOut_t result,
+                                 vectorBool_t&) const
       {
 	value_type omega = v [indexVelocity];
 	value_type cosOmega = cos (omega);
@@ -458,6 +472,7 @@ namespace hpp {
 	  (cosOmega * cosq - sinOmega * sinq);
 	result [indexConfig + 1] = (1.5-.5*norm2p) *
 	  (sinOmega * cosq + cosOmega * sinq);
+        return false;
       }
 
       void UnBounded::difference (ConfigurationIn_t q1, ConfigurationIn_t q2,
@@ -523,18 +538,24 @@ namespace hpp {
 	return fabs (q2 [index] - q1 [index]);
       }
 
-      void Bounded::integrate (ConfigurationIn_t q, vectorIn_t v,
+      bool Bounded::integrate (ConfigurationIn_t q, vectorIn_t v,
 			       const size_type& indexConfig,
 			       const size_type& indexVelocity,
-			       ConfigurationOut_t result) const
+			       ConfigurationOut_t result,
+                               vectorBool_t& saturate) const
       {
 	value_type omega = v [indexVelocity];
 	result [indexConfig] = q [indexConfig] + omega;
 	if (result [indexConfig] < lowerBound (0)) {
+          saturate [indexVelocity] = true;
 	  result [indexConfig] = lowerBound (0);
 	} else if (result [indexConfig] > upperBound (0)) {
+          saturate [indexVelocity] = true;
 	  result [indexConfig] = upperBound (0);
-	}
+	} else {
+          saturate [indexVelocity] = false;
+        }
+        return saturate[indexVelocity];
       }
 
       void Bounded::difference (ConfigurationIn_t q1, ConfigurationIn_t q2,

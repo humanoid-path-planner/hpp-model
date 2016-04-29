@@ -48,6 +48,7 @@ namespace hpp {
     enum Request_t {COLLISION, DISTANCE};
 
     typedef double value_type;
+    typedef std::vector<bool> vectorBool_t;
     typedef Eigen::Matrix <value_type, Eigen::Dynamic, 1> vector_t;
     typedef vector_t Configuration_t;
     typedef Eigen::Ref <const Configuration_t> ConfigurationIn_t;
