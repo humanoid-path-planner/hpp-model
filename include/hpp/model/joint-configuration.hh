@@ -90,13 +90,18 @@ namespace hpp {
       /// \param indexVelocity index of first component of v corresponding to
       ///        the joint
       /// \retval result write joint configuration in
+      /// \retval saturate vector of boolean set to True on DOF which where
+      ///         saturated (integration result would have been out of
+      ///         boundaries otherwise).
+      /// \return true if at least one parameter saturated.
       /// result [indexConfig:indexConfig + joint config size]
       /// \note if result is beying bounds, return active bound.
-      virtual void integrate (ConfigurationIn_t q,
+      virtual bool integrate (ConfigurationIn_t q,
 			      vectorIn_t v,
 			      const size_type& indexConfig,
 			      const size_type& indexVelocity,
-			      ConfigurationOut_t result) const = 0;
+			      ConfigurationOut_t result,
+                              vectorBool_t& saturate) const = 0;
 
       /// Difference between two configurations
       ///
@@ -185,11 +190,12 @@ namespace hpp {
 				  ConfigurationIn_t q2,
 				  const size_type& index) const;
 
-      virtual void integrate (ConfigurationIn_t q,
+      virtual bool integrate (ConfigurationIn_t q,
 			      vectorIn_t v,
 			      const size_type& indexConfig,
 			      const size_type& indexVelocity,
-			      ConfigurationOut_t result) const;
+			      ConfigurationOut_t result,
+                              vectorBool_t& saturate) const;
       virtual void difference (ConfigurationIn_t q1,
 			       ConfigurationIn_t q2,
 			       const size_type& indexConfig,
@@ -234,11 +240,12 @@ namespace hpp {
       value_type squaredDistance (ConfigurationIn_t q1,
 				  ConfigurationIn_t q2,
 				  const size_type& index) const;
-      virtual void integrate (ConfigurationIn_t q,
+      virtual bool integrate (ConfigurationIn_t q,
 			      vectorIn_t v,
 			      const size_type& indexConfig,
 			      const size_type& indexVelocity,
-			      ConfigurationOut_t result) const;
+			      ConfigurationOut_t result,
+                              vectorBool_t& saturate) const;
       /// Difference between two configurations
       ///
       /// \param q1 configuration,
@@ -300,11 +307,12 @@ namespace hpp {
       virtual value_type distance (ConfigurationIn_t q1,
 				   ConfigurationIn_t q2,
 				   const size_type& index) const = 0;
-      virtual void integrate (ConfigurationIn_t q,
+      virtual bool integrate (ConfigurationIn_t q,
 			      vectorIn_t v,
 			      const size_type& indexConfig,
 			      const size_type& indexVelocity,
-			      ConfigurationOut_t result) const = 0;
+			      ConfigurationOut_t result,
+                              vectorBool_t& saturate) const = 0;
 
       /// Difference between two configurations
       ///
@@ -368,10 +376,11 @@ namespace hpp {
         value_type squaredDistance (ConfigurationIn_t q1,
 				    ConfigurationIn_t q2,
 				    const size_type& index) const;
-	void integrate (ConfigurationIn_t q, vectorIn_t v,
+	bool integrate (ConfigurationIn_t q, vectorIn_t v,
 			const size_type& indexConfig,
 			const size_type& indexVelocity,
-			ConfigurationOut_t result) const;
+			ConfigurationOut_t result,
+                        vectorBool_t& saturate) const;
 	void difference (ConfigurationIn_t q1, ConfigurationIn_t q2,
 			 const size_type& indexConfig,
 			 const size_type& indexVelocity,
@@ -407,10 +416,11 @@ namespace hpp {
         value_type squaredDistance (ConfigurationIn_t q1,
 				    ConfigurationIn_t q2,
 				    const size_type& index) const;
-	void integrate (ConfigurationIn_t q, vectorIn_t v,
+	bool integrate (ConfigurationIn_t q, vectorIn_t v,
 			const size_type& indexConfig,
 			const size_type& indexVelocity,
-			ConfigurationOut_t result) const;
+			ConfigurationOut_t result,
+                        vectorBool_t& saturate) const;
 	void difference (ConfigurationIn_t q1, ConfigurationIn_t q2,
 			 const size_type& indexConfig,
 			 const size_type& indexVelocity,
@@ -457,11 +467,12 @@ namespace hpp {
 				  ConfigurationIn_t q2,
 				  const size_type& index) const;
 
-      virtual void integrate (ConfigurationIn_t q,
+      virtual bool integrate (ConfigurationIn_t q,
 			      vectorIn_t v,
 			      const size_type& indexConfig,
 			      const size_type& indexVelocity,
-			      ConfigurationOut_t result) const;
+			      ConfigurationOut_t result,
+            vectorBool_t& saturate) const;
       /// Difference between two configurations
       ///
       /// \param q1 configuration,
